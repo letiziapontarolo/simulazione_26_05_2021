@@ -6,20 +6,85 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import it.polito.tdp.yelp.model.Business;
 import it.polito.tdp.yelp.model.Review;
 import it.polito.tdp.yelp.model.User;
 
 public class YelpDao {
-
-	public List<Business> getAllBusiness(){
-		String sql = "SELECT * FROM Business";
-		List<Business> result = new ArrayList<Business>();
+	
+	public List<String> listaCity() {
+		
+		String sql = "SELECT distinct b.city "
+				+ "FROM business b "
+				+ "GROUP BY b.city "
+				+ "ORDER BY b.city";
+		List<String> result = new ArrayList<String>();
 		Connection conn = DBConnect.getConnection();
 
 		try {
 			PreparedStatement st = conn.prepareStatement(sql);
+			ResultSet res = st.executeQuery();
+			while (res.next()) {
+
+				result.add(res.getString("city"));
+			}
+			res.close();
+			st.close();
+			conn.close();
+			return result;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+public List<Integer> listaAnni() {
+		
+		String sql = "SELECT distinct year(r.review_date) AS data "
+				+ "FROM reviews r "
+				+ "ORDER BY year(r.review_date)";
+		List<Integer> result = new ArrayList<Integer>();
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			ResultSet res = st.executeQuery();
+			while (res.next()) {
+
+				result.add(res.getInt("data"));
+			}
+			res.close();
+			st.close();
+			conn.close();
+			return result;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public void creaVertici(Map<String, Business> businessIdMap, String city, int anno) {
+		
+		String sql = "SELECT b.*, AVG(r.stars) AS media "
+				+ "FROM reviews r, "
+				+ "(SELECT b.* "
+				+ "FROM business b, reviews r "
+				+ "WHERE b.city = (?) AND year(r.review_date) = ? "
+				+ "AND r.business_id = b.business_id "
+				+ "GROUP BY b.business_id) b "
+				+ "WHERE r.business_id = b.business_id "
+				+ "GROUP by b.business_id";
+	
+		Connection conn = DBConnect.getConnection();
+
+		try {
+			PreparedStatement st = conn.prepareStatement(sql);
+			st.setString(1, city);
+			st.setInt(2, anno);
 			ResultSet res = st.executeQuery();
 			while (res.next()) {
 
@@ -34,19 +99,19 @@ public class YelpDao {
 						res.getDouble("latitude"),
 						res.getDouble("longitude"),
 						res.getString("state"),
-						res.getDouble("stars"));
-				result.add(business);
+						res.getDouble("stars"),
+						res.getDouble("media"));
+				businessIdMap.put(res.getString("business_id"), business);
 			}
 			res.close();
 			st.close();
 			conn.close();
-			return result;
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
-			return null;
 		}
 	}
+
 	
 	public List<Review> getAllReviews(){
 		String sql = "SELECT * FROM Reviews";

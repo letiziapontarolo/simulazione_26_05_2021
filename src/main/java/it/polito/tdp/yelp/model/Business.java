@@ -13,10 +13,12 @@ public class Business {
 	private double longitude;
 	private String state;
 	private double stars;
+	private double media;
+	private double differenza;
 	
 	
 	public Business(String businessId, String fullAddress, String active, String categories, String city, int reviewCount,
-			String businessName, String neighborhoods, double latitude, double longitude, String state, double stars) {
+			String businessName, String neighborhoods, double latitude, double longitude, String state, double stars, double media) {
 		super();
 		this.businessId = businessId;
 		this.fullAddress = fullAddress;
@@ -30,8 +32,35 @@ public class Business {
 		this.longitude = longitude;
 		this.state = state;
 		this.stars = stars;
+		this.media = media;
 	}
 	
+	
+	
+	public double getDifferenza() {
+		return differenza;
+	}
+
+
+
+	public void setDifferenza(double differenza) {
+		this.differenza = differenza;
+	}
+
+
+
+	public double getMedia() {
+		return media;
+	}
+
+
+
+	public void setMedia(double media) {
+		this.media = media;
+	}
+
+
+
 	public String getBusinessId() {
 		return businessId;
 	}

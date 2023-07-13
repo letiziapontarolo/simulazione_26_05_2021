@@ -35,13 +35,13 @@ public class FXMLController {
     private Button btnPercorso; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbCitta"
-    private ComboBox<?> cmbCitta; // Value injected by FXMLLoader
+    private ComboBox<String> cmbCitta; // Value injected by FXMLLoader
 
     @FXML // fx:id="txtX"
     private TextField txtX; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbAnno"
-    private ComboBox<?> cmbAnno; // Value injected by FXMLLoader
+    private ComboBox<Integer> cmbAnno; // Value injected by FXMLLoader
 
     @FXML // fx:id="cmbLocale"
     private ComboBox<?> cmbLocale; // Value injected by FXMLLoader
@@ -56,11 +56,39 @@ public class FXMLController {
 
     @FXML
     void doCreaGrafo(ActionEvent event) {
+    	
+    	txtResult.clear();
+    	
+    	String citta = cmbCitta.getSelectionModel().getSelectedItem();
+    	 if (citta == null) {
+    	 txtResult.appendText("Perfavore seleziona una città!\n");
+    	 return;
+    	 }
+    	 
+    	 Integer anno = cmbAnno.getSelectionModel().getSelectedItem();
+    	 if (anno == null) {
+    	 txtResult.appendText("Perfavore seleziona un anno!\n");
+    	 return;
+    	 }
+    	 
+    	 this.model.creaGrafo(citta, anno);
+    	 
+    	 txtResult.appendText("Grafo creato!\n");
+    	 txtResult.appendText("#VERTICI: " + this.model.numeroVertici() + "\n");
+    	 txtResult.appendText("#ARCHI: " + this.model.numeroArchi() + "\n");
+    	 
 
     }
 
     @FXML
     void doLocaleMigliore(ActionEvent event) {
+    	
+    	if (this.model.verifica()) {
+    		txtResult.appendText("\nLOCALE MIGLIORE: " + this.model.localeMigliore());
+    	}
+    	else {
+    		txtResult.appendText("\nIl grafo non è ancora stato creato!");
+    	}
 
     }
 
@@ -78,5 +106,7 @@ public class FXMLController {
     
     public void setModel(Model model) {
     	this.model = model;
+    	cmbCitta.getItems().addAll(this.model.listaCitta());
+    	cmbAnno.getItems().addAll(this.model.listaAnni());
     }
 }
